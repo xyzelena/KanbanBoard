@@ -2,6 +2,8 @@
 
 This is a **Next.js** app that is a kanban board for managing documents. 
 
+View the application at the [link](https://kanban-board-meye2svup-xyzelenas-projects.vercel.app)
+
 The user can create and delete documents, filter by title, and drag and drop documents between columns to change their status. 
 
 **Redux Toolkit** was used for state management. The **react-beautiful-dnd** library was used to create an interactive drag-and-drop interface.
