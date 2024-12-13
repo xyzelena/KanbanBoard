@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
@@ -22,6 +24,8 @@ const Board: React.FC = () => {
     const documents = useSelector((state: RootState) => state.documents);
 
     const [newDocTitle, setNewDocTitle] = useState<string>('');
+
+    const [searchQuery, setSearchQuery] = useState<string>('');
 
     useEffect(() => {
         const savedDocuments = localStorage.getItem('documents');
@@ -72,15 +76,36 @@ const Board: React.FC = () => {
         }
     };
 
+    const handleSearchQuery = (e: {
+        target: {
+            value: React.SetStateAction<string>;
+        };
+    }) => setSearchQuery(e.target.value);
+
     const columns = [
         { id: 'in-progress', title: 'В работе' },
         { id: 'under-review', title: 'На проверке' },
         { id: 'completed', title: 'Завершено' },
     ];
 
+
+    const filteredDocuments = documents.filter((doc) =>
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>Kanban board</h1>
+
+            <div className={styles.filterSection}>
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchQuery}
+                    placeholder="Поиск по заголовку"
+                    className={styles.filterInput}
+                />
+            </div>
 
             <AddDocumentForm
                 newDocTitle={newDocTitle}
@@ -90,20 +115,17 @@ const Board: React.FC = () => {
 
             <DragDropContext onDragEnd={onDragEnd}>
                 <div className={styles.board}>
-                    {
-                        columns.map((column) => (
-                            <Column
-                                key={column.id}
-                                id={column.id}
-                                title={column.title}
-                                documents={
-                                    documents
-                                        .filter((doc) => doc.status === column.id)
-                                }
-                                onDelete={handleDeleteDocument}
-                            />
-                        ))
-                    }
+                    {columns.map((column) => (
+                        <Column
+                            key={column.id}
+                            id={column.id}
+                            title={column.title}
+                            documents={filteredDocuments.filter(
+                                (doc) => doc.status === column.id
+                            )}
+                            onDelete={handleDeleteDocument}
+                        />
+                    ))}
                 </div>
             </DragDropContext>
         </div>
